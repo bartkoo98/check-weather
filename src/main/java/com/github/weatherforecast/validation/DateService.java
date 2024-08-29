@@ -1,5 +1,8 @@
 package com.github.weatherforecast.validation;
 
+import com.github.weatherforecast.exceptions.date.PastDateException;
+import com.github.weatherforecast.exceptions.date.TooDistantDateException;
+import com.github.weatherforecast.exceptions.date.WrongDateFormatException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -7,7 +10,7 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
 @Service
-public class DateValidationService {
+public class DateService {
     private static final int MAX_DAYS_AHEAD = 6;
 
     public long checkAmountOfDays(String dateToCheck) {
@@ -15,14 +18,13 @@ public class DateValidationService {
         LocalDate dateToCheckWeather = parseDate(dateToCheck);
 
         if (dateToCheckWeather.isBefore(today)) {
-            // dodac obsluge exceptionow
+            throw new PastDateException(dateToCheck);
         }
 
         long days = ChronoUnit.DAYS.between(today, dateToCheckWeather);
 
         if (days > MAX_DAYS_AHEAD) {
-            // dodac obsluge exceptionow
-
+            throw new TooDistantDateException(days);
         }
 
         return days;
@@ -32,8 +34,7 @@ public class DateValidationService {
         try {
             return LocalDate.parse(dateToCheck);
         } catch (DateTimeParseException e) {
-            return null;
-            // dodac obsluge exceptionow
+            throw new WrongDateFormatException(dateToCheck);
         }
     }
 }

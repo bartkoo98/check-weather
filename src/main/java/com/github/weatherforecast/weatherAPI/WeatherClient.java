@@ -1,10 +1,10 @@
 package com.github.weatherforecast.weatherAPI;
 
+import com.github.weatherforecast.exceptions.weather.WeatherDataNotFoundException;
 import com.github.weatherforecast.model.Weather;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class WeatherClient {
@@ -14,28 +14,21 @@ public class WeatherClient {
     @Value("${weather.api.key}")
     private String apiKey;
 
-    private final WebClient webClient;
+    private final RestTemplate restTemplate = new RestTemplate();
 
-    public WeatherClient(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl(apiUrl).build();
-    }
 
-    public Mono<Weather> getWeatherForCity(String city, long day) {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/forecast/daily")
-                        .queryParam("city", city)
-                        .queryParam("key", apiKey)
-                        .build())
-                .retrieve()
-                .bodyToMono(WeatherLocationDto.class)
-                .map(response -> {
-                    DailyWeatherDto dailyWeatherDto = response.getData()[(int) day];
-                    return Weather.builder()
-                            .cityName(response.getCityName())
-                            .windSpeed(dailyWeatherDto.getWindSpeed())
-                            .averageTemperature(dailyWeatherDto.getTemp())
-                            .build();
-                });
+    public Weather getWeatherForCity(String city, long day) {
+        String url = String.format("%s?city=%s&key=%s", apiUrl, city, apiKey);
+
+        WeatherLocationDto response = restTemplate.getForObject(url, WeatherLocationDto.class);
+        if (response != null) {
+            return Weather.builder()
+                    .cityName(response.getCityName())
+                    .windSpeed(response.getData()[(int) day].getWindSpeed())
+                    .averageTemperature(response.getData()[(int) day].getTemp())
+                    .build();
+        } else {
+            throw new WeatherDataNotFoundException();
+        }
     }
 }

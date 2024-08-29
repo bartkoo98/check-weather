@@ -17,7 +17,7 @@ public class ForecastController {
 
     @GetMapping("/forecast/{date}")
     public ResponseEntity<Weather> getWeather(@PathVariable String date) {
-        Weather weatherInBestSpot = forecastService.getLocationWithBestWeatherConditions(date);
-        return new ResponseEntity<>(weatherInBestSpot, HttpStatus.OK);
+        Weather locationWithBestWeatherConditions = forecastService.getLocationWithBestWeatherConditions(date);
+        return new ResponseEntity<>(locationWithBestWeatherConditions, HttpStatus.OK);
     }
 }

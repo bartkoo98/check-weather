@@ -10,5 +10,6 @@ public class Weather {
     private String cityName;
     private double averageTemperature;
     private double windSpeed;
+    private double conditionsValue;
 
 }
