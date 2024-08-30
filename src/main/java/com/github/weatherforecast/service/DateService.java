@@ -1,4 +1,4 @@
-package com.github.weatherforecast.validation;
+package com.github.weatherforecast.service;
 
 import com.github.weatherforecast.exceptions.date.PastDateException;
 import com.github.weatherforecast.exceptions.date.TooDistantDateException;

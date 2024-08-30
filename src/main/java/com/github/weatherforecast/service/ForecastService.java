@@ -3,7 +3,6 @@ package com.github.weatherforecast.service;
 import com.github.weatherforecast.exceptions.weather.BadWeatherConditionsForAllLocationsException;
 import com.github.weatherforecast.model.Place;
 import com.github.weatherforecast.model.Weather;
-import com.github.weatherforecast.validation.DateService;
 import com.github.weatherforecast.weatherAPI.WeatherClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,7 @@ public class ForecastService {
         return findBestWeatherLocation(validWeatherList);
     }
 
-    private List<Weather> getWeatherForecastForAllLocations(long day) {
+    public List<Weather> getWeatherForecastForAllLocations(long day) {
         List<Weather> weatherList = new ArrayList<>();
 
         for (Place location : Place.values()) {
@@ -39,7 +38,7 @@ public class ForecastService {
         return weatherList;
     }
 
-    private List<Weather> filterValidSurfingConditions(List<Weather> weatherList) {
+    public List<Weather> filterValidSurfingConditions(List<Weather> weatherList) {
         return weatherList.stream()
                 .filter(this::isValidForWindsurfing)
                 .toList();
@@ -50,7 +49,7 @@ public class ForecastService {
                 weather.getAverageTemperature() >= 5 && weather.getAverageTemperature() <= 35;
     }
 
-    private Weather findBestWeatherLocation(List<Weather> weatherList) {
+    public Weather findBestWeatherLocation(List<Weather> weatherList) {
         if (weatherList.isEmpty()) {
             throw new BadWeatherConditionsForAllLocationsException();
         }
@@ -78,7 +77,7 @@ public class ForecastService {
                 .orElseThrow(BadWeatherConditionsForAllLocationsException::new);
     }
 
-    private double calculateValueFromSelectionCriteria(Weather weather) {
+    public double calculateValueFromSelectionCriteria(Weather weather) {
         return weather.getWindSpeed() * 3 + weather.getAverageTemperature();
     }
 }
